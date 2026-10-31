@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2024"
 description = "西游 · V126"
 
+# winmem 显式纳入 workspace：cargo test --workspace 能一次跑完两边的测试，
+# 构建产物也共用根目录这一个 target/。
+[workspace]
+members = ["crates/winmem"]
+
 [dependencies]
 # 跨进程读内存的小库。原来放在仓库外面（../winmem），克隆下来会缺依赖，现在收进 crates/
 winmem = { path = "crates/winmem" }

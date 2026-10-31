@@ -1,5 +1,7 @@
 # 编译产物（debug 6G + release 2.7G，全是可重建的中间物）
 target/
+# 万一 cd 进子 crate 单独构建，产物落在它自己目录里
+crates/winmem/target/
 
 # 工具会话数据
 .workbuddy/

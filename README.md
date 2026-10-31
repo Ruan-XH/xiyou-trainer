@@ -52,7 +52,7 @@
 git clone https://github.com/Ruan-XH/xiyou-trainer.git
 cd xiyou-trainer
 cargo run          # 先看界面（模拟器没开也能起，会显示「未找到模拟器」）
-cargo test         # 31 项单元测试
+cargo test --workspace   # 本体 31 项 + winmem 9 项 + 2 项文档测试
 ```
 
 发版（build + 写 exe 图标，**别用裸的 `cargo build --release`**，图标会丢）：
@@ -362,5 +362,6 @@ exe 的文件图标不是链接期打进去的：这台机器上没有 `rc.exe` 
 - `serde` / `serde_yaml` —— 读配置文件
 - `winmem`（`crates/winmem`，本人写的跨进程读写库，只依赖 `windows` 0.62）
 
-测试：`cargo test`（31 个单元测试，覆盖地址算术、配置校验、道具落点表，
-其中一条真的读自己进程的内存来验证类型分派）
+测试：`cargo test --workspace` —— 本体 31 项（地址算术、配置校验、道具落点表，
+其中一条真的读自己进程的内存来验证类型分派），winmem 9 项 + 2 项文档测试。
+只跑本体用 `cargo test`，只跑 winmem 用 `cargo test -p winmem`。
