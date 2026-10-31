@@ -1,0 +1,8 @@
+# GPUI 在 Windows 上默认主线程栈只有 1MB，UI 递归一深就爆栈。
+# 官方仓库也是这么设的（8MB）。
+#
+# `+crt-static`：把 C 运行库静态链进来，exe 就不依赖 VCRUNTIME140.dll。
+# 不设的话，干净机器（没装过 VC++ 2015-2022 运行库的）双击会报
+# 「找不到 VCRUNTIME140.dll」直接起不来。代价是体积大一点点。
+[target.'cfg(windows)']
+rustflags = ["-C", "link-arg=/STACK:8000000", "-C", "target-feature=+crt-static"]

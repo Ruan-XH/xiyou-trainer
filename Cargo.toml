@@ -1,0 +1,28 @@
+[package]
+name = "xiyou-trainer"
+version = "0.1.0"
+edition = "2024"
+description = "西游 · V126"
+
+[dependencies]
+winmem = { path = "../winmem" }
+# 读 config/offsets.yaml
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+# 界面。默认特性里带着 wgpu / accesskit / system_fonts 一大堆用不上的东西，
+# 这里只留 glow 后端，中文字体自己喂（见 app.rs 的 install_fonts）。
+eframe = { version = "0.37", default-features = false, features = [
+    "glow",
+    "default_fonts",
+] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true

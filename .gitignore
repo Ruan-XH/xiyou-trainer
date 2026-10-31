@@ -1,0 +1,11 @@
+# 编译产物（debug 6G + release 2.7G，全是可重建的中间物）
+target/
+
+# 工具会话数据
+.workbuddy/
+
+# 内存探测留下的快照（.bin 是 256KB 全 RAM 转储，.pkl 是二进制的稳定性采样）
+.probe/
+
+# 本机生成的绝对地址清单：随机基址每次启动都不同，放进仓库只会误导别人
+config/addresses.yaml
