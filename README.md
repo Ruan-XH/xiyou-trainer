@@ -36,6 +36,40 @@
 不能看角色 ID：空槽读出来也是 `0`，而 `0` 恰好是孙悟空的编号，会把空位显示成悟空。
 也不能看血量：空槽会留着上一局的 72 / 68。
 
+## 从源码构建
+
+**前置条件**（只列必须的）：
+
+| 项 | 要求 | 说明 |
+|---|---|---|
+| 系统 | Windows 10 / 11，x64 | 依赖 `ReadProcessMemory` 和 OpenGL，别的平台跑不了 |
+| Rust | stable 1.85 以上 | `Cargo.toml` 用 `edition = "2024"` |
+| 工具链 | **MSVC**，不是 GNU | `rustup default stable-x86_64-pc-windows-msvc`；GNU 工具链下 `.cargo/config.toml` 里的 `+crt-static` 和 `/STACK` 链接参数对不上 |
+
+三条命令：
+
+```bash
+git clone https://github.com/Ruan-XH/xiyou-trainer.git
+cd xiyou-trainer
+cargo run          # 先看界面（模拟器没开也能起，会显示「未找到模拟器」）
+cargo test         # 31 项单元测试
+```
+
+发版（build + 写 exe 图标，**别用裸的 `cargo build --release`**，图标会丢）：
+
+```bash
+powershell -ExecutionPolicy Bypass -File tools\build-release.ps1
+```
+
+产物在 `target/release/xiyou-trainer.exe`，约 6 MB，直接加图标那种「拷走就能双击」的单文件。
+
+仓库是**自包含**的：唯一一个非 crates.io 的依赖是跨进程读写库 `winmem`，已经放在
+`crates/winmem/` 里，不用另外 clone 什么。它也是普通 crate，可以单独 `cd` 进去
+`cargo run --example self_test` 自测。
+
+第一次编译会拉 `eframe` 一整套（glow / winit / egui），几百个 crate，慢一点是正常的；
+之后增量编译几秒。磁盘上 `target/` 会到 8G 上下，嫌大就 `cargo clean`，随时能重建。
+
 ## 跑起来
 
 ```bash
@@ -270,7 +304,8 @@ assets/logo.png          256×256 留档
 assets/logo.ico          多尺寸 exe 文件图标
 assets/icon64.rgba       裸 RGBA，编译期 include 进 exe 当窗口图标
 config/offsets.yaml      所有基址与偏移（改这个就行，不用动代码）
-config/addresses.yaml    上一次 --addresses 生成的绝对地址快照（可随时覆盖）
+config/addresses.yaml    上一次 --addresses 生成的绝对地址快照（可随时覆盖，不入库）
+crates/winmem/           跨进程读写库，独立 crate（读内存 / 枚举模块 / AOB 扫描）
 tools/make_icon.py       源图 → png / ico / rgba 三件套
 tools/set-exe-icon.ps1   把 ico 写进 exe 资源段
 tools/build-release.ps1  release + 写图标，一步到位
@@ -325,7 +360,7 @@ exe 的文件图标不是链接期打进去的：这台机器上没有 `rc.exe` 
 
 - `eframe` / `egui` 0.37 —— 即时模式界面，只开 glow 后端，不带 wgpu
 - `serde` / `serde_yaml` —— 读配置文件
-- `winmem`（`../winmem`，本人写的跨进程读写库）
+- `winmem`（`crates/winmem`，本人写的跨进程读写库，只依赖 `windows` 0.62）
 
-测试：`cargo test`（24 个单元测试，覆盖地址算术、配置校验、道具落点表，
+测试：`cargo test`（31 个单元测试，覆盖地址算术、配置校验、道具落点表，
 其中一条真的读自己进程的内存来验证类型分派）

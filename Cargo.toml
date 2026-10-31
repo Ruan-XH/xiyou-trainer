@@ -5,7 +5,8 @@ edition = "2024"
 description = "西游 · V126"
 
 [dependencies]
-winmem = { path = "../winmem" }
+# 跨进程读内存的小库。原来放在仓库外面（../winmem），克隆下来会缺依赖，现在收进 crates/
+winmem = { path = "crates/winmem" }
 # 读 config/offsets.yaml
 serde = { version = "1", features = ["derive"] }
 serde_yaml = "0.9"
